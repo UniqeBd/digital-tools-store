@@ -40,11 +40,6 @@
             color: white;
             font-weight: bold;
         }
-        .product-img {
-            height: 180px;
-            object-fit: cover;
-            width: 100%;
-        }
         .price-option {
             border-bottom: 1px solid #eee;
             padding: 10px 0;
@@ -52,26 +47,40 @@
         .price-option:last-child {
             border-bottom: none;
         }
+        .payment-details {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .payment-address {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            word-break: break-all;
+        }
+        .cart-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            font-size: 0.7rem;
+        }
+        .ad-banner {
+            background: #f1f1f1;
+            padding: 15px;
+            text-align: center;
+            margin: 20px 0;
+            border-radius: 5px;
+            border: 1px dashed #ccc;
+        }
         .btn-buy {
             background: var(--success-color);
             border: none;
         }
         .btn-buy:hover {
             background: #27ae60;
-        }
-        .btn-add-to-cart {
-            background: var(--secondary-color);
-            border: none;
-        }
-        .btn-add-to-cart:hover {
-            background: #2980b9;
-        }
-        .price-option-buttons {
-            display: flex;
-            gap: 5px;
-        }
-        .price-option-buttons .btn {
-            flex: 1;
         }
     </style>
 </head>
@@ -98,6 +107,11 @@
                             <span class="badge bg-danger cart-badge" id="cartCount">0</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="admin.html">
+                            <i class="fas fa-user-shield me-1"></i>Admin Login
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -105,6 +119,12 @@
 
     <!-- Main Content -->
     <div class="container">
+        <!-- Ad Banner -->
+        <div class="ad-banner">
+            <p>Advertisement Space (Adsterra)</p>
+            <div id="adsterra-banner"></div>
+        </div>
+
         <!-- Products Section -->
         <div id="productsSection">
             <h2 class="text-center mb-4">Our Marketing Tools</h2>
@@ -121,7 +141,6 @@
                     <thead>
                         <tr>
                             <th>Product</th>
-                            <th>Image</th>
                             <th>Plan</th>
                             <th>Price</th>
                             <th>Action</th>
@@ -132,7 +151,7 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th colspan="3">Total</th>
+                            <th colspan="2">Total</th>
                             <th id="cartTotal">$0</th>
                             <th></th>
                         </tr>
@@ -243,7 +262,6 @@
                 id: 1,
                 name: "Adsterra Earning Bot",
                 description: "Automated bot to maximize your Adsterra earnings",
-                image: "https://via.placeholder.com/300x180?text=Adsterra+Bot",
                 prices: [
                     { duration: "Weekly", price: 50 },
                     { duration: "Monthly", price: 150 },
@@ -254,7 +272,6 @@
                 id: 2,
                 name: "CPA Marketing AutoLead Bot",
                 description: "Automated fake signups for CPA marketing",
-                image: "https://via.placeholder.com/300x180?text=CPA+Bot",
                 prices: [
                     { duration: "Monthly", price: 100 },
                     { duration: "Yearly", price: 1000 }
@@ -264,7 +281,6 @@
                 id: 3,
                 name: "Facebook Auto Comment Bot",
                 description: "Automated commenting for Facebook marketing",
-                image: "https://via.placeholder.com/300x180?text=FB+Comment+Bot",
                 prices: [
                     { duration: "Monthly", price: 100 }
                 ]
@@ -273,7 +289,6 @@
                 id: 4,
                 name: "Facebook Group Manager Bot",
                 description: "Auto join groups, post, and manage Facebook groups",
-                image: "https://via.placeholder.com/300x180?text=FB+Group+Bot",
                 prices: [
                     { duration: "Monthly", price: 100 }
                 ]
@@ -318,16 +333,10 @@
                                 <strong>${price.duration}</strong>
                                 <div class="text-success">$${price.price}</div>
                             </div>
-                            <div class="price-option-buttons">
-                                <button class="btn btn-sm btn-add-to-cart text-white" 
-                                        onclick="addToCart(${product.id}, '${product.name}', '${product.image}', '${price.duration}', ${price.price})">
-                                    <i class="fas fa-cart-plus"></i>
-                                </button>
-                                <button class="btn btn-sm btn-buy text-white" 
-                                        onclick="buyNow(${product.id}, '${product.name}', '${product.image}', '${price.duration}', ${price.price})">
-                                    <i class="fas fa-bolt"></i>
-                                </button>
-                            </div>
+                            <button class="btn btn-sm btn-primary" 
+                                    onclick="addToCart(${product.id}, '${product.name}', '${price.duration}', ${price.price})">
+                                <i class="fas fa-cart-plus"></i> Add
+                            </button>
                         </div>
                     `;
                 });
@@ -337,7 +346,6 @@
                         <div class="card-header">
                             ${product.name}
                         </div>
-                        <img src="${product.image}" class="product-img" alt="${product.name}">
                         <div class="card-body">
                             <p class="card-text">${product.description}</p>
                             <hr>
@@ -351,7 +359,7 @@
         }
 
         // Add item to cart
-        function addToCart(productId, productName, productImage, duration, price) {
+        function addToCart(productId, productName, duration, price) {
             const existingItem = cart.find(item => 
                 item.productId === productId && item.duration === duration);
             
@@ -361,7 +369,6 @@
                 cart.push({
                     productId,
                     productName,
-                    productImage,
                     duration,
                     price,
                     quantity: 1
@@ -370,23 +377,6 @@
             
             updateCartCount();
             alert(`${productName} (${duration}) added to cart!`);
-        }
-
-        // Buy Now function
-        function buyNow(productId, productName, productImage, duration, price) {
-            // Clear cart and add only this item
-            cart = [{
-                productId,
-                productName,
-                productImage,
-                duration,
-                price,
-                quantity: 1
-            }];
-            
-            updateCartCount();
-            checkout();
-            alert(`You're buying ${productName} (${duration}) now!`);
         }
 
         // Update cart count display
@@ -414,7 +404,6 @@
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${item.productName}</td>
-                    <td><img src="${item.productImage}" style="height: 50px;"></td>
                     <td>${item.duration}</td>
                     <td>$${itemTotal.toFixed(2)}</td>
                     <td>
@@ -451,6 +440,20 @@
             document.getElementById('cartSection').style.display = 'none';
             document.getElementById('paymentSection').style.display = 'none';
         }
+
+        // Simulate Adsterra ad loading
+        function loadAdsterraAds() {
+            // In a real implementation, this would load actual Adsterra ads
+            document.getElementById('adsterra-banner').innerHTML = `
+                <div style="background: #f0f0f0; padding: 20px; border-radius: 5px;">
+                    <p>Adsterra Banner Ad (728x90)</p>
+                    <small>This would be replaced with real Adsterra ad code</small>
+                </div>
+            `;
+        }
+
+        // Initialize ads
+        loadAdsterraAds();
     </script>
 </body>
 </html>
